@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Medal, Star } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { db, ref, get, query, orderByChild, limitToLast } from '../firebase/config';
 import { motion } from 'motion/react';
+import NativeAdBanner from '../components/NativeAdBanner';
 
 export default function Leaderboard() {
   const navigate = useNavigate();
@@ -57,57 +58,59 @@ export default function Leaderboard() {
           </div>
         ) : (
           leaders.map((leader, index) => (
-            <motion.div 
-              key={leader.uid} 
-              initial={{ x: index % 2 === 0 ? -20 : 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.05 }}
-              className={`bg-bg-card/50 backdrop-blur-sm border rounded-3xl p-5 flex items-center justify-between relative overflow-hidden group transition-all shadow-xl ${
-                leader.uid === user?.uid 
-                  ? 'border-primary shadow-neon-primary z-10' 
-                  : 'border-white/10 hover:border-white/20'
-              }`}
-            >
-              {leader.uid === user?.uid && (
-                <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-              )}
-              
-              <div className="flex items-center space-x-4">
-                <div className="w-10 flex justify-center items-center">
-                  {index === 0 ? <Trophy size={32} className="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]" /> :
-                   index === 1 ? <Medal size={28} className="text-gray-300 drop-shadow-[0_0_8px_rgba(209,213,219,0.5)]" /> :
-                   index === 2 ? <Medal size={28} className="text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]" /> :
-                   <span className="text-lg font-black text-text-muted font-gaming tracking-tighter opacity-50">{index + 1}</span>}
-                </div>
-                <div className="relative">
-                  <img src={leader.avatar || null} alt={leader.username} className="w-12 h-12 rounded-2xl border-2 border-white/10 object-cover" />
-                  {index < 3 && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center border border-bg-dark">
-                      <Star size={8} className="text-white" fill="currentColor" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <div className="font-black text-white font-gaming text-lg tracking-tight flex items-center space-x-2">
-                    <span>{leader.username}</span>
-                    {leader.uid === user?.uid && (
-                      <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full font-black font-gaming tracking-widest uppercase">You</span>
+            <Fragment key={leader.uid}>
+              <motion.div 
+                initial={{ x: index % 2 === 0 ? -20 : 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className={`bg-bg-card/50 backdrop-blur-sm border rounded-3xl p-5 flex items-center justify-between relative overflow-hidden group transition-all shadow-xl ${
+                  leader.uid === user?.uid 
+                    ? 'border-primary shadow-neon-primary z-10' 
+                    : 'border-white/10 hover:border-white/20'
+                }`}
+              >
+                {leader.uid === user?.uid && (
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                )}
+                
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 flex justify-center items-center">
+                    {index === 0 ? <Trophy size={32} className="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]" /> :
+                     index === 1 ? <Medal size={28} className="text-gray-300 drop-shadow-[0_0_8px_rgba(209,213,219,0.5)]" /> :
+                     index === 2 ? <Medal size={28} className="text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]" /> :
+                     <span className="text-lg font-black text-text-muted font-gaming tracking-tighter opacity-50">{index + 1}</span>}
+                  </div>
+                  <div className="relative">
+                    <img src={leader.avatar || null} alt={leader.username} className="w-12 h-12 rounded-2xl border-2 border-white/10 object-cover" />
+                    {index < 3 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center border border-bg-dark">
+                        <Star size={8} className="text-white" fill="currentColor" />
+                      </div>
                     )}
                   </div>
-                  <div className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase mt-1 opacity-60">{leader.rankTier}</div>
+                  <div>
+                    <div className="font-black text-white font-gaming text-lg tracking-tight flex items-center space-x-2">
+                      <span>{leader.username}</span>
+                      {leader.uid === user?.uid && (
+                        <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full font-black font-gaming tracking-widest uppercase">You</span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase mt-1 opacity-60">{leader.rankTier}</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex flex-col items-end">
-                <span className="text-lg font-black text-yellow-400 font-gaming tracking-tighter text-glow-up">{(leader.rp || 0).toLocaleString()} <span className="text-xs">PTS</span></span>
-                <div className="flex items-center gap-1.5 mt-2 bg-black/40 px-3 py-1 rounded-full border border-white/10">
-                  <Star size={10} className="text-yellow-400" />
-                  <span className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase">
-                    {leader.wins || 0} WINS
-                  </span>
+                
+                <div className="flex flex-col items-end">
+                  <span className="text-lg font-black text-yellow-400 font-gaming tracking-tighter text-glow-up">{(leader.rp || 0).toLocaleString()} <span className="text-xs">PTS</span></span>
+                  <div className="flex items-center gap-1.5 mt-2 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                    <Star size={10} className="text-yellow-400" />
+                    <span className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase">
+                      {leader.wins || 0} WINS
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+              {index === 2 && <NativeAdBanner />}
+            </Fragment>
           ))
         )}
       </div>

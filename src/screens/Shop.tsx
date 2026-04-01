@@ -5,6 +5,7 @@ import { useAppStore } from '../store/useAppStore';
 import { db, ref, update } from '../firebase/config';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import NativeAdBanner from '../components/NativeAdBanner';
 
 export default function Shop() {
   const navigate = useNavigate();
@@ -126,6 +127,8 @@ export default function Shop() {
             />
           </div>
         </section>
+
+        <NativeAdBanner />
 
         <section className="pt-4 relative z-10 pb-10">
           <div className="flex items-center justify-between mb-6">
