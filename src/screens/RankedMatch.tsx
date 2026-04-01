@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Shield, Star, Zap } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useEnergy, MAX_ENERGY } from '../hooks/useEnergy';
+import { db, ref, update } from '../firebase/config';
 
 export default function RankedMatch() {
   const navigate = useNavigate();
@@ -54,10 +55,21 @@ export default function RankedMatch() {
           <h1 className="text-xl font-black text-white ml-2 font-gaming tracking-widest uppercase">Rank Match</h1>
         </div>
         <div className="flex flex-col items-end">
-          <div className="flex items-center space-x-1 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 shadow-inner">
+          <button 
+            onClick={() => {
+              if (currentEnergy < MAX_ENERGY && user) {
+                window.open('https://www.profitablecpmratenetwork.com/mp1vkhzhk4?key=06a4b284e401f193b5b573230ad39254', '_blank');
+                update(ref(db, `users/${user.uid}`), {
+                  energy: MAX_ENERGY,
+                  lastEnergyUpdate: Date.now()
+                }).catch(console.error);
+              }
+            }}
+            className="flex items-center space-x-1 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 shadow-inner hover:bg-white/5 transition-colors"
+          >
             <Zap size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" fill="currentColor" />
             <span className="text-sm font-black text-white font-gaming">{currentEnergy}/{MAX_ENERGY}</span>
-          </div>
+          </button>
           {timeUntilNext > 0 && (
             <span className="text-[10px] text-yellow-400/80 mt-1 mr-1 font-mono font-bold">
               {formatTime(timeUntilNext)}

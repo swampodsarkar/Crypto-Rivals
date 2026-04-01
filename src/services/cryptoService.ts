@@ -48,6 +48,12 @@ export const getRandomCoin = async (): Promise<Coin> => {
   return coins[Math.floor(Math.random() * coins.length)];
 };
 
+export const getRandomCoins = async (count: number): Promise<Coin[]> => {
+  const coins = await fetchTopCoins();
+  const shuffled = [...coins].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
 export const getMockPriceUpdate = (currentPrice: number) => {
   const volatility = currentPrice * 0.001; // 0.1% volatility
   const change = (Math.random() - 0.5) * volatility;

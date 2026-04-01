@@ -332,18 +332,22 @@ export default function Profile() {
         {activeTab === 'stats' ? (
         <div className="p-4">
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-bg-dark/50 p-4 rounded-2xl border border-white/5 flex flex-col items-center">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">RP</span>
-              <span className="text-xl font-black text-white font-mono">{(profileUser.rp || 0).toLocaleString()}</span>
+          <div className="grid grid-cols-4 gap-2 mb-6">
+            <div className="bg-bg-dark/50 p-3 rounded-2xl border border-white/5 flex flex-col items-center">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">RP</span>
+              <span className="text-lg font-black text-white font-mono">{(profileUser.rp || 0).toLocaleString()}</span>
             </div>
-            <div className="bg-bg-dark/50 p-4 rounded-2xl border border-white/5 flex flex-col items-center">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">COINS</span>
-              <span className="text-xl font-black text-primary font-mono">{(profileUser.coins || 0).toLocaleString()}</span>
+            <div className="bg-bg-dark/50 p-3 rounded-2xl border border-white/5 flex flex-col items-center">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">COINS</span>
+              <span className="text-lg font-black text-primary font-mono">{(profileUser.coins || 0).toLocaleString()}</span>
             </div>
-            <div className="bg-bg-dark/50 p-4 rounded-2xl border border-white/5 flex flex-col items-center">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">TROPHIES</span>
-              <span className="text-xl font-black text-purple-400 font-mono">{profileUser.trophies}</span>
+            <div className="bg-bg-dark/50 p-3 rounded-2xl border border-white/5 flex flex-col items-center">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">TROPHIES</span>
+              <span className="text-lg font-black text-purple-400 font-mono">{profileUser.trophies}</span>
+            </div>
+            <div className="bg-bg-dark/50 p-3 rounded-2xl border border-white/5 flex flex-col items-center">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1 font-gaming">BOXES</span>
+              <span className="text-lg font-black text-orange-400 font-mono">{profileUser.mysteryBoxes || 0}</span>
             </div>
           </div>
 

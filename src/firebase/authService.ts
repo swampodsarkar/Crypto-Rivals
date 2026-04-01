@@ -96,6 +96,7 @@ export const loginWithUsername = async (username: string) => {
         bestStreak: 0,
         coins: 5000,
         gems: 100,
+        mysteryBoxes: 0,
         energy: 5,
         lastEnergyUpdate: Date.now(),
         createdAt: Date.now(),
@@ -104,6 +105,12 @@ export const loginWithUsername = async (username: string) => {
         equippedTitle: 'BEGINNER',
         unlockedTitles: ['BEGINNER'],
         honorScore: 100,
+        quests: [
+          { id: 'q1', description: 'Win 3 Ranked Matches', target: 3, progress: 0, rewardType: 'rp', rewardAmount: 50, completed: false, claimed: false },
+          { id: 'q2', description: 'Predict correctly 5 times in a row', target: 5, progress: 0, rewardType: 'mysteryBox', rewardAmount: 1, completed: false, claimed: false },
+          { id: 'q3', description: 'Play 5 Classic Matches', target: 5, progress: 0, rewardType: 'coins', rewardAmount: 500, completed: false, claimed: false }
+        ],
+        lastQuestReset: Date.now(),
       };
       await set(userRef, newUser);
       console.log("New user profile created");

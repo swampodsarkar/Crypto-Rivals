@@ -4,8 +4,9 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Swords, Search, Zap } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { db, ref, set, get, onValue, update, remove, serverTimestamp, onDisconnect } from '../firebase/config';
-import { getRandomCoin } from '../services/cryptoService';
+import { getRandomCoin, getRandomCoins } from '../services/cryptoService';
 import { useEnergy, MAX_ENERGY } from '../hooks/useEnergy';
+import PopunderAd from '../components/PopunderAd';
 
 export default function PvPMatchmaking() {
   const navigate = useNavigate();
@@ -23,10 +24,10 @@ export default function PvPMatchmaking() {
     return () => {
       // Cleanup on unmount
       if (queueRef && user) {
-        remove(ref(db, `queue/pvp/${user.uid}`));
+        remove(ref(db, `queue/${mode}/${user.uid}`));
       }
     };
-  }, [queueRef, user]);
+  }, [queueRef, user, mode]);
 
   const handleFindMatch = async () => {
     if (!user) return;
@@ -89,30 +90,27 @@ export default function PvPMatchmaking() {
 
         // Create room
         const roomId = `room_${Date.now()}_${user.uid}`;
-        const coin = await getRandomCoin();
+        const draftCoins = await getRandomCoins(3);
         const duration = 3 * 60; // 3 minutes
         
-        // Assign sides randomly
-        const iAmUp = Math.random() > 0.5;
-
         await update(ref(db), {
           [`rooms/${roomId}`]: {
             mode: mode,
-            coin: coin.symbol,
             duration: duration,
-            status: 'live',
-            startPrice: coin.price,
-            startTime: serverTimestamp(),
-            endTime: Date.now() + duration * 1000,
+            status: 'drafting',
+            draftCoins: draftCoins.map(c => ({ symbol: c.symbol, price: c.price })),
+            bannedCoins: [],
             player1: {
               uid: user.uid,
               username: user.username,
-              choice: iAmUp ? 'UP' : 'DOWN'
+              bannedCoin: null,
+              choice: null
             },
             player2: {
               uid: opponent.uid,
               username: opponent.username,
-              choice: iAmUp ? 'DOWN' : 'UP'
+              bannedCoin: null,
+              choice: null
             }
           },
           [`queue/${mode}/${user.uid}/status`]: 'matched',
@@ -126,7 +124,7 @@ export default function PvPMatchmaking() {
 
   const handleCancel = async () => {
     if (user) {
-      await remove(ref(db, `queue/pvp/${user.uid}`));
+      await remove(ref(db, `queue/${mode}/${user.uid}`));
       setStatus('idle');
       setQueueRef(null);
       // Note: We don't refund energy on cancel for this prototype
@@ -142,6 +140,7 @@ export default function PvPMatchmaking() {
 
   return (
     <div className="mobile-container bg-bg-dark flex flex-col">
+      <PopunderAd />
       <div className="flex items-center justify-between p-5 border-b border-border bg-bg-card">
         <div className="flex items-center">
           <button 
@@ -156,10 +155,21 @@ export default function PvPMatchmaking() {
           <h1 className="text-xl font-black text-white ml-2 font-gaming uppercase tracking-widest">{mode} PvP</h1>
         </div>
         <div className="flex flex-col items-end">
-          <div className="flex items-center space-x-1 bg-bg-dark px-3 py-1.5 rounded-full border border-border/50">
+          <button 
+            onClick={() => {
+              if (currentEnergy < MAX_ENERGY && user) {
+                window.open('https://www.profitablecpmratenetwork.com/mp1vkhzhk4?key=06a4b284e401f193b5b573230ad39254', '_blank');
+                update(ref(db, `users/${user.uid}`), {
+                  energy: MAX_ENERGY,
+                  lastEnergyUpdate: Date.now()
+                }).catch(console.error);
+              }
+            }}
+            className="flex items-center space-x-1 bg-bg-dark px-3 py-1.5 rounded-full border border-border/50 hover:bg-white/5 transition-colors"
+          >
             <Zap size={14} className="text-yellow-400" fill="currentColor" />
             <span className="text-sm font-bold text-white">{currentEnergy}/{MAX_ENERGY}</span>
-          </div>
+          </button>
           {timeUntilNext > 0 && (
             <span className="text-[10px] text-text-muted mt-1 mr-1 font-mono">
               {formatTime(timeUntilNext)}

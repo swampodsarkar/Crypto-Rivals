@@ -78,6 +78,45 @@ export default function Shop() {
           <p className="text-text-muted font-bold font-rajdhani uppercase tracking-widest text-sm max-w-[280px]">Get more RP or unlock exclusive premium features.</p>
         </div>
 
+        {/* Earn Coins Section */}
+        <section className="relative z-10 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xs font-black text-text-muted uppercase tracking-[0.3em] font-gaming">\\\\ Free Rewards</h3>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent ml-4" />
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                window.open('https://www.profitablecpmratenetwork.com/mp1vkhzhk4?key=06a4b284e401f193b5b573230ad39254', '_blank');
+                if (user) {
+                  update(ref(db, `users/${user.uid}`), {
+                    coins: (user.coins || 0) + 150
+                  }).then(() => {
+                    setShowSuccess(true);
+                    setTimeout(() => setShowSuccess(false), 2000);
+                  }).catch(console.error);
+                }
+              }}
+              className="bg-bg-card/50 backdrop-blur-sm border border-primary/50 rounded-3xl p-6 flex items-center justify-between relative overflow-hidden group shadow-[0_0_15px_rgba(0,229,255,0.2)] hover:shadow-[0_0_25px_rgba(0,229,255,0.4)] transition-all"
+            >
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-neon-primary">
+                  <Coins size={28} className="text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]" />
+                </div>
+                <div className="text-left">
+                  <h4 className="font-black text-white font-gaming tracking-widest uppercase text-sm">Watch Ad</h4>
+                  <p className="text-[10px] text-primary font-bold font-rajdhani uppercase tracking-widest mt-1">Earn 150 Free Coins</p>
+                </div>
+              </div>
+              <div className="bg-primary/20 border border-primary/50 text-primary px-5 py-2.5 rounded-xl font-black font-gaming tracking-widest uppercase text-xs group-hover:bg-primary/30 transition-colors">
+                WATCH
+              </div>
+            </motion.button>
+          </div>
+        </section>
+
         <section className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xs font-black text-text-muted uppercase tracking-[0.3em] font-gaming">\\\\ Coin Packs</h3>

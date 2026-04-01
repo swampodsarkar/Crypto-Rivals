@@ -2,6 +2,17 @@ import { create } from 'zustand';
 
 export type RankTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond' | 'Master';
 
+export interface Quest {
+  id: string;
+  description: string;
+  target: number;
+  progress: number;
+  rewardType: 'coins' | 'gems' | 'rp' | 'mysteryBox';
+  rewardAmount: number;
+  completed: boolean;
+  claimed: boolean;
+}
+
 export interface UserProfile {
   uid: string;
   username: string;
@@ -29,6 +40,9 @@ export interface UserProfile {
   signature?: string;
   lastClaimed?: number;
   guildId?: string;
+  mysteryBoxes?: number;
+  quests?: Quest[];
+  lastQuestReset?: number;
 }
 
 interface AppState {
