@@ -138,7 +138,7 @@ export default function Home() {
   };
 
   return (
-    <div className="mobile-container bg-bg-dark overflow-y-auto no-scrollbar pb-10 relative">
+    <div className="flex-1 overflow-y-auto no-scrollbar pb-10 relative">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 rounded-full blur-[100px]" />
@@ -241,7 +241,7 @@ export default function Home() {
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-bg-dark rounded-full p-1 shadow-xl">
                   <div className="bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 w-8 h-8 rounded-full flex items-center justify-center border border-yellow-200/50 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]">
-                    <span className="text-xs font-black text-white drop-shadow-md font-gaming">{user.rankTier[0]}</span>
+                    <span className="text-xs font-black text-white drop-shadow-md font-gaming">{(user.rankTier || 'B')[0]}</span>
                   </div>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center mb-2 border border-yellow-500/20">
               <Trophy size={20} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" />
             </div>
-            <span className="text-[10px] font-bold text-white tracking-widest font-gaming uppercase">Rank</span>
+            <span className="text-[8px] font-bold text-white tracking-widest font-gaming uppercase">Leaderboard</span>
           </motion.button>
 
           <motion.button
@@ -358,7 +358,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2 border border-primary/20">
               <Shield size={20} className="text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]" />
             </div>
-            <span className="text-[10px] font-bold text-white tracking-widest font-gaming uppercase">Guild</span>
+            <span className="text-[10px] font-bold text-white tracking-widest font-gaming uppercase">Guilds</span>
           </motion.button>
 
           <motion.button
@@ -398,7 +398,7 @@ export default function Home() {
           </motion.button>
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 w-full z-50">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50">
         <AdBanner />
       </div>
 

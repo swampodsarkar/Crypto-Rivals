@@ -142,7 +142,7 @@ export default function PvPMatchmaking() {
   };
 
   return (
-    <div className="mobile-container bg-bg-dark flex flex-col">
+    <div className="flex-1 flex flex-col bg-bg-dark">
       <PopunderAd />
       <div className="flex items-center justify-between p-5 border-b border-border bg-bg-card">
         <div className="flex items-center">

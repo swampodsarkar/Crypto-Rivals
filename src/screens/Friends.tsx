@@ -157,7 +157,7 @@ export default function Friends() {
   if (!user) return null;
 
   return (
-    <div className="mobile-container bg-bg-dark flex flex-col min-h-screen">
+    <div className="flex-1 flex flex-col bg-bg-dark">
       {/* Header */}
       <div className="flex items-center p-5 border-b border-white/10 bg-bg-card/80 backdrop-blur-md relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 via-primary to-blue-600" />
