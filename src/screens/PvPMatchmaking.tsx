@@ -261,7 +261,7 @@ export default function PvPMatchmaking() {
           >
             <div className="flex items-center justify-center space-x-6 mb-8">
               <div className="flex flex-col items-center">
-                <img src={user?.avatar || null} alt="You" className="w-20 h-20 rounded-full border-2 border-primary mb-2" />
+                <img src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} alt="You" className="w-20 h-20 rounded-full border-2 border-primary mb-2" />
                 <span className="font-bold text-white">You</span>
               </div>
               <div className="text-3xl font-black text-red-500 italic">VS</div>

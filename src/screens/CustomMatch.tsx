@@ -159,7 +159,7 @@ export default function CustomMatch() {
               className="flex-1 flex flex-col items-center"
             >
               <div className="w-24 h-24 rounded-3xl bg-bg-card border-2 border-primary mb-4 overflow-hidden shadow-neon-primary relative group">
-                <img src={roomData.players[roomData.host].avatar || null} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                <img src={roomData.players[roomData.host].avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${roomData.players[roomData.host].username}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-bg-dark/60 to-transparent" />
               </div>
               <span className="font-black text-sm text-center line-clamp-1 font-gaming tracking-widest uppercase text-white">{roomData.players[roomData.host].username}</span>
@@ -186,7 +186,7 @@ export default function CustomMatch() {
               <div className="w-24 h-24 rounded-3xl bg-bg-card border-2 border-red-500 mb-4 overflow-hidden shadow-neon-down relative group">
                 {(() => {
                   const guestId = Object.keys(roomData.players).find(k => k !== roomData.host)!;
-                  return <img src={roomData.players[guestId].avatar || null} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />;
+                  return <img src={roomData.players[guestId].avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${roomData.players[guestId].username}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />;
                 })()}
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-bg-dark/60 to-transparent" />
               </div>

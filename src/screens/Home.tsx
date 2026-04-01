@@ -234,7 +234,7 @@ export default function Home() {
               <div className="relative cursor-pointer" onClick={() => navigate('/profile')}>
                 <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-br from-primary to-purple-600 shadow-lg">
                   <img 
-                    src={user.avatar || null} 
+                    src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} 
                     alt="Avatar" 
                     className="w-full h-full rounded-full border-2 border-bg-dark object-cover"
                   />

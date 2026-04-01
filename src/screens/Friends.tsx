@@ -211,7 +211,7 @@ export default function Friends() {
                 >
                   <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(`/profile/${f.uid}`)}>
                     <div className="relative">
-                      <img src={f.avatar || null} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
+                      <img src={f.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.username}`} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
                       <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-green-500 border-2 border-bg-dark" />
                     </div>
                     <span className="font-black text-white font-gaming tracking-tight text-lg">{f.username}</span>
@@ -252,7 +252,7 @@ export default function Friends() {
                   className="bg-bg-card/50 backdrop-blur-sm border border-white/10 p-4 rounded-3xl flex items-center justify-between group hover:border-white/20 transition-all shadow-xl"
                 >
                   <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(`/profile/${req.uid}`)}>
-                    <img src={req.avatar || null} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
+                    <img src={req.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${req.username}`} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
                     <span className="font-black text-white font-gaming tracking-tight text-lg">{req.username}</span>
                   </div>
                   <div className="flex gap-3">
@@ -303,7 +303,7 @@ export default function Friends() {
                     className="bg-bg-card/50 backdrop-blur-sm border border-white/10 p-4 rounded-3xl flex items-center justify-between group hover:border-white/20 transition-all shadow-xl"
                   >
                     <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(`/profile/${res.uid}`)}>
-                      <img src={res.avatar || null} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
+                      <img src={res.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${res.username}`} alt="" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 object-cover" />
                       <div className="flex flex-col">
                         <span className="font-black text-white font-gaming tracking-tight text-lg">{res.username}</span>
                         <span className="text-[9px] text-text-muted font-mono tracking-widest uppercase opacity-60">UID: {res.uid.substring(0,12)}...</span>

@@ -15,15 +15,15 @@ export default function Leaderboard() {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const scoresRef = query(ref(db, 'scores'), orderByChild('score'), limitToLast(50));
-        const snapshot = await get(scoresRef);
+        const usersRef = query(ref(db, 'users'), orderByChild('rp'), limitToLast(50));
+        const snapshot = await get(usersRef);
         
         if (snapshot.exists()) {
           const data = snapshot.val();
           const leaderArray = Object.keys(data).map(key => ({
-            id: key,
+            uid: key,
             ...data[key]
-          })).sort((a, b) => b.score - a.score);
+          })).sort((a, b) => b.rp - a.rp);
           
           setLeaders(leaderArray);
         }
@@ -80,21 +80,33 @@ export default function Leaderboard() {
                      index === 2 ? <Medal size={28} className="text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]" /> :
                      <span className="text-lg font-black text-text-muted font-gaming tracking-tighter opacity-50">{index + 1}</span>}
                   </div>
+                  <div className="relative">
+                    <img src={leader.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.username}`} alt={leader.username} className="w-12 h-12 rounded-2xl border-2 border-white/10 object-cover" />
+                    {index < 3 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center border border-bg-dark">
+                        <Star size={8} className="text-white" fill="currentColor" />
+                      </div>
+                    )}
+                  </div>
                   <div>
                     <div className="font-black text-white font-gaming text-lg tracking-tight flex items-center space-x-2">
-                      <span>{leader.displayName}</span>
+                      <span>{leader.username}</span>
                       {leader.uid === user?.uid && (
                         <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full font-black font-gaming tracking-widest uppercase">You</span>
                       )}
                     </div>
-                    <div className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase mt-1 opacity-60">
-                      {new Date(leader.timestamp).toLocaleDateString()}
-                    </div>
+                    <div className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase mt-1 opacity-60">{leader.rankTier}</div>
                   </div>
                 </div>
                 
                 <div className="flex flex-col items-end">
-                  <span className="text-lg font-black text-yellow-400 font-gaming tracking-tighter text-glow-up">{(leader.score || 0).toLocaleString()} <span className="text-xs">SCORE</span></span>
+                  <span className="text-lg font-black text-yellow-400 font-gaming tracking-tighter text-glow-up">{(leader.rp || 0).toLocaleString()} <span className="text-xs">PTS</span></span>
+                  <div className="flex items-center gap-1.5 mt-2 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                    <Star size={10} className="text-yellow-400" />
+                    <span className="text-[10px] text-text-muted font-black font-gaming tracking-widest uppercase">
+                      {leader.wins || 0} WINS
+                    </span>
+                  </div>
                 </div>
               </motion.div>
               {index === 2 && <NativeAdBanner />}
