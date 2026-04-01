@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, Zap, Eye, Gift } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, Zap, Eye, Gift, Target, Coins, Crosshair } from 'lucide-react';
 import { COINS, Coin } from '../services/cryptoService';
 import { useAppStore } from '../store/useAppStore';
-import { db, ref, push, set, update, serverTimestamp } from '../firebase/config';
+import { db, ref, push, set, update, serverTimestamp, onDisconnect } from '../firebase/config';
 import { useEnergy, MAX_ENERGY } from '../hooks/useEnergy';
 import PopunderAd from '../components/PopunderAd';
 
@@ -12,12 +12,24 @@ export default function ClassicMatch() {
   const navigate = useNavigate();
   const { user } = useAppStore();
   const { currentEnergy, timeUntilNext, consumeEnergy } = useEnergy();
-  const [selectedCoin, setSelectedCoin] = useState<Coin>(COINS[0]);
+  const MODE_OPTIONS = [
+    { id: 'standard', name: 'Standard', icon: Target, desc: 'Classic reflex training', color: 'text-blue-400' },
+    { id: 'gold-rush', name: 'Gold Rush', icon: Coins, desc: '2x Points & Coins', color: 'text-yellow-400' },
+    { id: 'sniper', name: 'Sniper', icon: Crosshair, desc: 'Tiny targets, High RP', color: 'text-red-400' },
+  ];
+  const [selectedMode, setSelectedMode] = useState(MODE_OPTIONS[0]);
+
+  const DIFFICULTY_OPTIONS = [
+    { id: 'easy', name: 'Recruit', multiplier: 1, color: 'text-green-400', desc: 'Large Targets' },
+    { id: 'medium', name: 'Veteran', multiplier: 1.5, color: 'text-blue-400', desc: 'Medium Targets' },
+    { id: 'hard', name: 'Elite', multiplier: 2.5, color: 'text-red-400', desc: 'Small Targets' },
+  ];
+  const [selectedDifficulty, setSelectedDifficulty] = useState(DIFFICULTY_OPTIONS[0]);
   
   const DURATION_OPTIONS = [
-    { time: 15, label: '15s', risk: 'Low Risk', multiplier: 1 },
-    { time: 30, label: '30s', risk: 'Medium Risk', multiplier: 1.5 },
-    { time: 60, label: '60s', risk: 'High Risk', multiplier: 2 },
+    { time: 60, label: '1 Min', multiplier: 1 },
+    { time: 120, label: '2 Min', multiplier: 1.5 },
+    { time: 180, label: '3 Min', multiplier: 2 },
   ];
   const [selectedDuration, setSelectedDuration] = useState(DURATION_OPTIONS[0]);
   
@@ -32,13 +44,10 @@ export default function ClassicMatch() {
   const [availableCoins, setAvailableCoins] = useState<Coin[]>([]);
 
   useEffect(() => {
-    // Pick 5 random coins
-    const shuffled = [...COINS].sort(() => 0.5 - Math.random());
-    setAvailableCoins(shuffled.slice(0, 5));
-    setSelectedCoin(shuffled[0]);
+    // No longer need coins
   }, []);
 
-  const handlePredict = async (choice: 'UP' | 'DOWN') => {
+  const handleStartMatch = async () => {
     if (!user || isSubmitting) return;
     
     if (currentEnergy <= 0) {
@@ -78,29 +87,26 @@ export default function ClassicMatch() {
       const now = Date.now();
       const endTime = now + selectedDuration.time * 1000;
       
-      // Difficulty based on rank points
-      const difficulty = user.rankPoints > 5000 ? 'hard' : user.rankPoints > 2000 ? 'medium' : 'easy';
-
-      // Oracle Hint (randomly generated if active)
-      const oracleHint = activePowerUps.includes('oracle') ? (Math.random() > 0.5 ? 'UP' : 'DOWN') : null;
-
       await set(roomRef, {
         mode: 'classic',
-        coin: selectedCoin.symbol,
         duration: selectedDuration.time,
-        multiplier: selectedDuration.multiplier,
+        multiplier: selectedDuration.multiplier * selectedDifficulty.multiplier,
         status: 'live',
-        startPrice: selectedCoin.price,
         startTime: serverTimestamp(),
         endTime: endTime,
-        difficulty: difficulty,
+        difficulty: selectedDifficulty.id,
+        gameMode: selectedMode.id,
         player1: {
           uid: user.uid,
-          choice: choice,
-          oracleHint: oracleHint,
+          username: user.username,
+          currentScore: 0,
           doubleBoost: activePowerUps.includes('double')
         }
       });
+
+      // Set activeRoomId for spectating
+      await update(ref(db, `users/${user.uid}`), { activeRoomId: roomId });
+      onDisconnect(ref(db, `users/${user.uid}/activeRoomId`)).set(null);
 
       navigate(`/live/${roomId}`);
     } catch (error) {
@@ -171,28 +177,55 @@ export default function ClassicMatch() {
         {/* Background Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Coin Selection */}
+        {/* Game Mode Selection */}
         <section className="relative z-10">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] font-gaming">\\\\ Select Asset</h2>
+            <h2 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] font-gaming">\\\\ Game Mode</h2>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent ml-4" />
           </div>
-          <div className="grid grid-cols-5 gap-2">
-            {availableCoins.map(coin => (
+          <div className="grid grid-cols-3 gap-3">
+            {MODE_OPTIONS.map(opt => {
+              const Icon = opt.icon;
+              return (
+                <motion.button
+                  key={opt.id}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedMode(opt)}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                    selectedMode.id === opt.id
+                      ? `border-primary bg-primary/20`
+                      : 'border-white/5 bg-bg-card/50 hover:border-white/20'
+                  }`}
+                >
+                  <Icon size={18} className={`mb-1 ${selectedMode.id === opt.id ? opt.color : 'text-text-muted'}`} />
+                  <span className={`text-[10px] font-black font-gaming tracking-widest uppercase text-center ${selectedMode.id === opt.id ? opt.color : 'text-white'}`}>{opt.name}</span>
+                  <span className="text-[7px] text-text-muted mt-1 uppercase tracking-wider text-center leading-tight">{opt.desc}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Difficulty Selection */}
+        <section className="relative z-10">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] font-gaming">\\\\ Training Level</h2>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent ml-4" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {DIFFICULTY_OPTIONS.map(opt => (
               <motion.button
-                key={coin.symbol}
+                key={opt.id}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCoin(coin)}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all ${
-                  selectedCoin.symbol === coin.symbol
-                    ? 'border-primary bg-primary/20'
+                onClick={() => setSelectedDifficulty(opt)}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                  selectedDifficulty.id === opt.id
+                    ? `border-primary bg-primary/20`
                     : 'border-white/5 bg-bg-card/50 hover:border-white/20'
                 }`}
               >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mb-1 text-[10px] font-black" style={{ color: coin.color }}>
-                  {coin.symbol[0]}
-                </div>
-                <span className="text-[10px] font-black text-white">{coin.symbol}</span>
+                <span className={`text-xs font-black font-gaming tracking-widest uppercase ${opt.color}`}>{opt.name}</span>
+                <span className="text-[8px] text-text-muted mt-1 uppercase tracking-wider">{opt.desc}</span>
               </motion.button>
             ))}
           </div>
@@ -201,7 +234,7 @@ export default function ClassicMatch() {
         {/* Duration Selection */}
         <section className="relative z-10">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] font-gaming">\\\\ Duration & Risk</h2>
+            <h2 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] font-gaming">\\\\ Session Time</h2>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent ml-4" />
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -218,7 +251,6 @@ export default function ClassicMatch() {
               >
                 <Clock size={16} className={selectedDuration.time === opt.time ? 'text-blue-400 mb-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'text-text-muted mb-1'} />
                 <span className={`font-black text-sm font-gaming tracking-widest ${selectedDuration.time === opt.time ? 'text-blue-400' : 'text-white'}`}>{opt.label}</span>
-                <span className="text-[8px] text-text-muted mt-1 uppercase tracking-wider">{opt.risk}</span>
                 {selectedDuration.time === opt.time && <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-500" />}
               </motion.button>
             ))}
@@ -277,12 +309,12 @@ export default function ClassicMatch() {
         )}
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => handlePredict('UP')}
+          onClick={handleStartMatch}
           disabled={isSubmitting || currentEnergy <= 0}
-          className="w-full bg-gradient-to-r from-up/20 to-up/5 border-2 border-up/50 hover:border-up text-up rounded-2xl py-5 flex flex-col items-center justify-center space-y-1 transition-all shadow-neon-up disabled:opacity-50 group"
+          className="w-full bg-gradient-to-r from-primary/20 to-primary/5 border-2 border-primary/50 hover:border-primary text-primary rounded-2xl py-5 flex flex-col items-center justify-center space-y-1 transition-all shadow-neon-primary disabled:opacity-50 group"
         >
-          <TrendingUp size={32} className="group-hover:-translate-y-1 transition-transform" />
-          <span className="font-black text-xl font-gaming tracking-[0.2em] uppercase">Enter Match</span>
+          <Zap size={32} className="group-hover:-translate-y-1 transition-transform" />
+          <span className="font-black text-xl font-gaming tracking-[0.2em] uppercase">Start Shooting</span>
         </motion.button>
       </div>
     </div>

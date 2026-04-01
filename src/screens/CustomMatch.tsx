@@ -49,27 +49,23 @@ export default function CustomMatch() {
           setTimeout(async () => {
             const guestId = players.find(id => id !== user.uid)!;
             const guest = data.players[guestId];
-            const coin = await getRandomCoin();
             const duration = 3 * 60; // 3 minutes
-            const iAmUp = Math.random() > 0.5;
 
             await update(roomRef, {
               status: 'live',
               mode: 'custom',
-              coin: coin.symbol,
               duration: duration,
-              startPrice: coin.price,
               startTime: serverTimestamp(),
               endTime: Date.now() + duration * 1000,
               player1: {
                 uid: user.uid,
                 username: user.username,
-                choice: iAmUp ? 'UP' : 'DOWN'
+                currentScore: 0
               },
               player2: {
                 uid: guestId,
                 username: guest.username,
-                choice: iAmUp ? 'DOWN' : 'UP'
+                currentScore: 0
               }
             });
           }, 2000);

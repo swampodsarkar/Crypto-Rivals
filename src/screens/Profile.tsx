@@ -76,17 +76,17 @@ export default function Profile() {
     if (!profileUser) return;
     const fetchHistory = async () => {
       try {
-        const historyRef = query(ref(db, `matchHistory/${profileUser.uid}`), limitToLast(5));
+        const historyRef = query(ref(db, `missionHistory/${profileUser.uid}`), limitToLast(10));
         const snap = await get(historyRef);
         if (snap.exists()) {
           const data = snap.val();
           const formatted = Object.keys(data)
             .map(k => ({ id: k, ...data[k] }))
-            .sort((a, b) => b.playedAt - a.playedAt);
+            .sort((a, b) => b.timestamp - a.timestamp);
           setRecentMatches(formatted);
         }
       } catch (error) {
-        console.error("Error fetching history:", error);
+        console.error("Error fetching mission history:", error);
       } finally {
         setLoading(false);
       }
@@ -112,16 +112,16 @@ export default function Profile() {
     </div>
   );
 
-  const level = Math.floor(profileUser.rp / 1000) + 1;
-  const winRate = profileUser.matches > 0 ? Math.round((profileUser.wins / profileUser.matches) * 100) : 0;
+  const level = Math.floor((profileUser.rp || 0) / 1000) + 1;
+  const avgAccuracy = profileUser.avgAccuracy || 0;
   const uidShort = profileUser.uid.substring(0, 10).toUpperCase();
   const likes = profileUser.likes || 0;
 
   const achievements = [
-    { id: 1, name: 'First Blood', unlocked: profileUser.wins > 0, icon: <Target size={20} /> },
-    { id: 2, name: 'Hot Streak', unlocked: profileUser.bestStreak >= 3, icon: <Zap size={20} /> },
-    { id: 3, name: 'Wealthy', unlocked: profileUser.rp >= 5000, icon: <Coins size={20} /> },
-    { id: 4, name: 'Veteran', unlocked: profileUser.matches >= 50, icon: <Swords size={20} /> },
+    { id: 1, name: 'First Blood', unlocked: (profileUser.totalHits || 0) > 0, icon: <Target size={16} /> },
+    { id: 2, name: 'Sniper', unlocked: (profileUser.avgAccuracy || 0) >= 80, icon: <Zap size={16} /> },
+    { id: 3, name: 'Elite', unlocked: (profileUser.highScore || 0) >= 10000, icon: <Coins size={16} /> },
+    { id: 4, name: 'Veteran', unlocked: (profileUser.totalMissions || 0) >= 50, icon: <Swords size={16} /> },
   ];
 
   const handleLike = async () => {
@@ -357,32 +357,32 @@ export default function Profile() {
               <div className="w-12 h-12 mb-2 relative flex items-center justify-center">
                 <Crown size={36} className="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
               </div>
-              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">RANK TIER</div>
-              <div className="font-mono text-[10px] uppercase font-black text-white">{profileUser.rankTier}</div>
+              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">HIGH SCORE</div>
+              <div className="font-mono text-[10px] uppercase font-black text-white">{(profileUser.highScore || 0).toLocaleString()}</div>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 mb-2 relative flex items-center justify-center">
                 <Shield size={36} className="text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-1">{winRate}%</div>
+                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-1">{avgAccuracy}%</div>
               </div>
-              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">WIN RATE</div>
-              <div className="font-mono text-[10px] uppercase font-black text-white">HEROIC</div>
+              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">ACCURACY</div>
+              <div className="font-mono text-[10px] uppercase font-black text-white">ELITE</div>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 mb-2 relative flex items-center justify-center">
                 <Swords size={36} className="text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
-                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-2">{profileUser.matches}</div>
+                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-2">{profileUser.totalMissions || 0}</div>
               </div>
-              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">MATCHES</div>
-              <div className="font-mono text-[10px] uppercase font-black text-white">RUSHER</div>
+              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">MISSIONS</div>
+              <div className="font-mono text-[10px] uppercase font-black text-white">SNIPER</div>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 mb-2 relative flex items-center justify-center">
                 <Activity size={36} className="text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]" />
-                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-2">{profileUser.honorScore ?? 100}</div>
+                <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-white text-xs mt-2">{profileUser.totalHits || 0}</div>
               </div>
-              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">HONOR</div>
-              <div className="font-mono text-[10px] uppercase font-black text-white">EXCELLENT</div>
+              <div className="text-[8px] text-gray-400 font-bold tracking-widest font-gaming uppercase">TOTAL HITS</div>
+              <div className="font-mono text-[10px] uppercase font-black text-white">DEADLY</div>
             </div>
           </div>
 
@@ -414,7 +414,7 @@ export default function Profile() {
                 <div key={ach.id} className="flex flex-col items-center">
                   <div className={`w-10 h-10 mb-2 flex items-center justify-center transform rotate-45 border-2 ${ach.unlocked ? 'border-yellow-400 bg-yellow-400/10 shadow-[0_0_10px_rgba(250,204,21,0.3)] text-yellow-400' : 'border-gray-700 bg-gray-800/50 text-gray-600'}`}>
                     <div className="transform -rotate-45">
-                      {React.cloneElement(ach.icon as React.ReactElement, { size: 16 })}
+                      {ach.icon}
                     </div>
                   </div>
                   <span className={`text-[8px] font-bold tracking-widest font-gaming ${ach.unlocked ? 'text-yellow-400' : 'text-gray-600'}`}>
@@ -462,20 +462,23 @@ export default function Profile() {
             ) : (
               <div className="space-y-3">
                 {recentMatches.map((match) => (
-                  <div key={match.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800 to-gray-900 border-l-4 border-gray-700 rounded-sm shadow-md">
+                  <div key={match.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800 to-gray-900 border-l-4 border-red-500 rounded-sm shadow-md">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-sm flex items-center justify-center ${match.result === 'win' ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' : match.result === 'loss' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>
-                        {match.result === 'win' ? <Trophy size={24} /> : <Activity size={24} />}
+                      <div className="w-12 h-12 rounded-sm flex items-center justify-center bg-red-500/20 text-red-400 border border-red-500/30">
+                        <Target size={24} />
                       </div>
                       <div>
-                        <span className="text-sm font-black text-white uppercase tracking-wider">{match.type || 'Classic'} MATCH</span>
-                        <span className="text-xs text-gray-500 block mt-1 font-mono">
-                          {new Date(match.playedAt).toLocaleDateString()}
-                        </span>
+                        <span className="text-sm font-black text-white uppercase tracking-wider">MISSION</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] text-gray-500 font-mono">
+                            {new Date(match.timestamp).toLocaleDateString()}
+                          </span>
+                          <span className="text-[10px] text-primary font-bold">{match.accuracy}% ACC</span>
+                        </div>
                       </div>
                     </div>
-                    <div className={`text-lg font-black ${match.result === 'win' ? 'text-yellow-400' : match.result === 'loss' ? 'text-red-400' : 'text-gray-400'}`}>
-                      {match.result === 'win' ? '+' : match.result === 'loss' ? '-' : ''}{match.rpChange || 0} RP
+                    <div className="text-lg font-black text-yellow-400">
+                      {match.score.toLocaleString()}
                     </div>
                   </div>
                 ))}

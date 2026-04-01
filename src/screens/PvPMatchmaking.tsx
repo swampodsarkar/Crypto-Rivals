@@ -90,34 +90,37 @@ export default function PvPMatchmaking() {
 
         // Create room
         const roomId = `room_${Date.now()}_${user.uid}`;
-        const draftCoins = await getRandomCoins(3);
         const duration = 3 * 60; // 3 minutes
         
         await update(ref(db), {
           [`rooms/${roomId}`]: {
             mode: mode,
             duration: duration,
-            status: 'drafting',
-            draftCoins: draftCoins.map(c => ({ symbol: c.symbol, price: c.price })),
-            bannedCoins: [],
+            status: 'live',
+            startTime: serverTimestamp(),
+            endTime: Date.now() + duration * 1000,
             player1: {
               uid: user.uid,
               username: user.username,
-              bannedCoin: null,
-              choice: null
+              currentScore: 0
             },
             player2: {
-              uid: opponent.uid,
+              uid: opponentUid,
               username: opponent.username,
-              bannedCoin: null,
-              choice: null
+              currentScore: 0
             }
           },
           [`queue/${mode}/${user.uid}/status`]: 'matched',
           [`queue/${mode}/${user.uid}/roomId`]: roomId,
           [`queue/${mode}/${opponentUid}/status`]: 'matched',
           [`queue/${mode}/${opponentUid}/roomId`]: roomId,
+          [`users/${user.uid}/activeRoomId`]: roomId,
+          [`users/${opponentUid}/activeRoomId`]: roomId,
         });
+
+        // Setup disconnect cleanup for activeRoomId
+        onDisconnect(ref(db, `users/${user.uid}/activeRoomId`)).set(null);
+        onDisconnect(ref(db, `users/${opponentUid}/activeRoomId`)).set(null);
       }
     }
   };
@@ -198,7 +201,7 @@ export default function PvPMatchmaking() {
             <h2 className="text-2xl font-black text-white mb-2 font-gaming uppercase">Head-to-Head</h2>
             <p className="text-text-muted mb-8 font-rajdhani uppercase tracking-widest font-bold">
               Match against a real player.<br/>
-              3 minute duration. Opposite predictions.<br/>
+              3 minute duration. Highest score wins.<br/>
               Winner takes all.
             </p>
             

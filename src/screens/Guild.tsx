@@ -124,7 +124,7 @@ export default function Guild() {
         [user.uid]: {
           username: user.username,
           avatar: user.avatar,
-          role: 'leader'
+          role: 'leader' as const
         }
       },
       trophies: user.trophies,

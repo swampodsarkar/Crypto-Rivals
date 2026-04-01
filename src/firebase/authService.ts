@@ -94,6 +94,10 @@ export const loginWithUsername = async (username: string) => {
         draws: 0,
         currentStreak: 0,
         bestStreak: 0,
+        highScore: 0,
+        totalMissions: 0,
+        totalHits: 0,
+        avgAccuracy: 0,
         coins: 5000,
         gems: 100,
         mysteryBoxes: 0,
@@ -106,9 +110,9 @@ export const loginWithUsername = async (username: string) => {
         unlockedTitles: ['BEGINNER'],
         honorScore: 100,
         quests: [
-          { id: 'q1', description: 'Win 3 Ranked Matches', target: 3, progress: 0, rewardType: 'rp', rewardAmount: 50, completed: false, claimed: false },
-          { id: 'q2', description: 'Predict correctly 5 times in a row', target: 5, progress: 0, rewardType: 'mysteryBox', rewardAmount: 1, completed: false, claimed: false },
-          { id: 'q3', description: 'Play 5 Classic Matches', target: 5, progress: 0, rewardType: 'coins', rewardAmount: 500, completed: false, claimed: false }
+          { id: 'q1', description: 'Score 5,000 points in one mission', target: 5000, progress: 0, rewardType: 'rp', rewardAmount: 50, completed: false, claimed: false },
+          { id: 'q2', description: 'Hit 50 targets', target: 50, progress: 0, rewardType: 'mysteryBox', rewardAmount: 1, completed: false, claimed: false },
+          { id: 'q3', description: 'Complete 5 missions', target: 5, progress: 0, rewardType: 'coins', rewardAmount: 500, completed: false, claimed: false }
         ],
         lastQuestReset: Date.now(),
       };

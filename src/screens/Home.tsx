@@ -7,6 +7,8 @@ import {
   Trophy, 
   Coins, 
   Swords, 
+  Target,
+  Crosshair,
   BarChart2, 
   Gift, 
   History, 
@@ -18,7 +20,6 @@ import {
   Users,
   Shield,
   Settings,
-  Target
 } from 'lucide-react';
 import { logout } from '../firebase/authService';
 import { db, ref, update } from '../firebase/config';
@@ -245,8 +246,26 @@ export default function Home() {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-sm font-gaming uppercase">{user.username}</h2>
-                <p className="text-xs text-primary font-bold tracking-widest uppercase font-gaming">{user.rankTier} Rank</p>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-sm font-gaming uppercase">{user.username}</h2>
+                  <div className="bg-primary/20 border border-primary/50 px-2 py-0.5 rounded text-[10px] font-black text-primary font-gaming">
+                    LVL {user.level || 1}
+                  </div>
+                </div>
+                <p className="text-xs text-primary font-bold tracking-widest uppercase font-gaming mb-2">{user.rankTier} Rank</p>
+                
+                {/* XP Bar */}
+                <div className="w-48 h-2 bg-black/40 rounded-full border border-white/5 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((user.xp || 0) % 1000) / 10}%` }}
+                    className="h-full bg-gradient-to-r from-primary to-blue-500 shadow-[0_0_10px_rgba(0,229,255,0.5)]"
+                  />
+                </div>
+                <div className="flex justify-between w-48 mt-1">
+                  <span className="text-[8px] font-bold text-text-muted uppercase tracking-widest">XP Progress</span>
+                  <span className="text-[8px] font-bold text-primary uppercase tracking-widest">{(user.xp || 0) % 1000} / 1000</span>
+                </div>
               </div>
             </div>
           </div>
@@ -268,11 +287,11 @@ export default function Home() {
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center space-x-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center border border-blue-500/20 shadow-inner">
-                    <BarChart2 size={28} className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
+                    <Target size={28} className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
                   </div>
                   <div className="text-left">
                     <h3 className="text-xl font-black text-white tracking-wide font-gaming uppercase">Classic Match</h3>
-                    <p className="text-[10px] text-blue-200/60 font-bold mt-0.5 font-rajdhani tracking-widest uppercase">Casual prediction. Earn RP.</p>
+                    <p className="text-[10px] text-blue-200/60 font-bold mt-0.5 font-rajdhani tracking-widest uppercase">Reflex training. Earn RP.</p>
                   </div>
 
                 </div>
@@ -299,11 +318,11 @@ export default function Home() {
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center space-x-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 flex items-center justify-center border border-purple-500/20 shadow-inner">
-                    <Trophy size={28} className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.5)]" />
+                    <Crosshair size={28} className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.5)]" />
                   </div>
                   <div className="text-left">
                     <h3 className="text-xl font-black text-white tracking-wide font-gaming uppercase">Ranked PvP</h3>
-                    <p className="text-[10px] text-purple-200/60 font-bold mt-0.5 font-rajdhani tracking-widest uppercase">1v1 Duel. Climb ranks.</p>
+                    <p className="text-[10px] text-purple-200/60 font-bold mt-0.5 font-rajdhani tracking-widest uppercase">1v1 Duel. Highest score wins.</p>
                   </div>
 
                 </div>

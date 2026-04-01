@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, UserPlus, Users, Search, Swords, Check, X, User } from 'lucide-react';
+import { ArrowLeft, UserPlus, Users, Search, Swords, Check, X, User, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { db, ref, get, set, remove, onValue, push } from '../firebase/config';
@@ -23,7 +23,31 @@ export default function Friends() {
     const unsubFriends = onValue(friendsRef, (snap) => {
       if (snap.exists()) {
         const data = snap.val();
-        setFriends(Object.keys(data).map(k => ({ uid: k, ...data[k] })));
+        const friendUids = Object.keys(data);
+        
+        // Fetch full user data for each friend to check activeRoomId
+        const fetchStatus = async () => {
+          const friendsWithStatus = await Promise.all(friendUids.map(async (uid) => {
+            const userSnap = await get(ref(db, `users/${uid}`));
+            const userData = userSnap.val();
+            
+            let activeRoom = null;
+            if (userData?.activeRoomId) {
+              const roomSnap = await get(ref(db, `rooms/${userData.activeRoomId}`));
+              activeRoom = roomSnap.val();
+            }
+
+            return {
+              uid,
+              ...data[uid],
+              activeRoomId: userData?.activeRoomId,
+              activeRoomMode: activeRoom?.mode,
+              activeRoomStatus: activeRoom?.status
+            };
+          }));
+          setFriends(friendsWithStatus);
+        };
+        fetchStatus();
       } else {
         setFriends([]);
       }
@@ -196,9 +220,18 @@ export default function Friends() {
                     <button onClick={() => navigate(`/profile/${f.uid}`)} className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-text-muted transition-colors">
                       <User size={18} />
                     </button>
-                    <button onClick={() => handleChallenge(f.uid)} className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90 text-bg-dark rounded-2xl font-black font-gaming tracking-widest uppercase flex items-center gap-2 shadow-neon-up active:scale-95 transition-all text-xs">
-                      <Swords size={16} /> Challenge
-                    </button>
+                    {f.activeRoomId && (f.activeRoomStatus === 'live' || f.activeRoomStatus === 'sudden_death_live') ? (
+                      <button 
+                        onClick={() => navigate(`/live/${f.activeRoomId}`)}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 text-white rounded-2xl font-black font-gaming tracking-widest uppercase flex items-center gap-2 shadow-neon-primary active:scale-95 transition-all text-xs"
+                      >
+                        <Eye size={16} /> Spectate
+                      </button>
+                    ) : (
+                      <button onClick={() => handleChallenge(f.uid)} className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90 text-bg-dark rounded-2xl font-black font-gaming tracking-widest uppercase flex items-center gap-2 shadow-neon-up active:scale-95 transition-all text-xs">
+                        <Swords size={16} /> Challenge
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               ))

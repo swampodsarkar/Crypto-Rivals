@@ -43,6 +43,8 @@ export interface UserProfile {
   mysteryBoxes?: number;
   quests?: Quest[];
   lastQuestReset?: number;
+  xp?: number;
+  level?: number;
 }
 
 interface AppState {
