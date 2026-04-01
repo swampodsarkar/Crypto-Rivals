@@ -20,6 +20,7 @@ import {
   Settings
 } from 'lucide-react';
 import { logout } from '../firebase/authService';
+import AdBanner from '../components/AdBanner';
 
 export default function Home() {
   const { user } = useAppStore();
@@ -250,6 +251,9 @@ export default function Home() {
           </motion.button>
 
         </div>
+      </div>
+      <div className="fixed bottom-0 left-0 w-full z-50">
+        <AdBanner />
       </div>
     </div>
   );

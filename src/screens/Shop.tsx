@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { db, ref, update } from '../firebase/config';
 import { useState } from 'react';
+import AdBanner from '../components/AdBanner';
 
 export default function Shop() {
   const navigate = useNavigate();
@@ -191,6 +192,9 @@ export default function Shop() {
           </motion.div>
         )}
       </AnimatePresence>
+      <div className="fixed bottom-0 left-0 w-full z-50">
+        <AdBanner />
+      </div>
     </div>
   );
 }
