@@ -51,7 +51,7 @@ export default function Login() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-3xl font-black text-white tracking-widest font-gaming uppercase"
         >
-          BullBear Arena
+          Crypto Rivals
         </motion.h1>
         
         <motion.p 
